@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>math on JN3008</title>
-    <link>https://example.org/tags/math/</link>
-    <description>Recent content in math on JN3008</description>
+    <title>math on jn3008</title>
+    <link>https://jn3008.com/tags/math/</link>
+    <description>Recent content in math on jn3008</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>© {year}</copyright>
-    <lastBuildDate>Fri, 05 Jun 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://example.org/tags/math/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 05 Jun 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://jn3008.com/tags/math/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Math Typesetting</title>
-      <link>https://example.org/blender/math-typesetting/</link>
+      <link>https://jn3008.com/blender/math-typesetting/</link>
       <pubDate>Fri, 05 Jun 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://example.org/blender/math-typesetting/</guid>
+      <guid>https://jn3008.com/blender/math-typesetting/</guid>
       <description>&lt;p&gt;Mathematical notation in a Hugo project can be enabled by using third party JavaScript libraries.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Math Typesetting</title>
-      <link>https://example.org/blog/math-typesetting/</link>
+      <link>https://jn3008.com/blog/math-typesetting/</link>
       <pubDate>Fri, 05 Jun 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://example.org/blog/math-typesetting/</guid>
+      <guid>https://jn3008.com/blog/math-typesetting/</guid>
       <description>&lt;p&gt;Mathematical notation in a Hugo project can be enabled by using third party JavaScript libraries.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Math Typesetting</title>
-      <link>https://example.org/processing/math-typesetting/</link>
+      <link>https://jn3008.com/processing/math-typesetting/</link>
       <pubDate>Fri, 05 Jun 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://example.org/processing/math-typesetting/</guid>
+      <guid>https://jn3008.com/processing/math-typesetting/</guid>
       <description>&lt;p&gt;Mathematical notation in a Hugo project can be enabled by using third party JavaScript libraries.&lt;/p&gt;</description>
     </item>
     

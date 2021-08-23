@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Categories on JN3008</title>
-    <link>https://example.org/categories/</link>
-    <description>Recent content in Categories on JN3008</description>
+    <title>Categories on jn3008</title>
+    <link>https://jn3008.com/categories/</link>
+    <description>Recent content in Categories on jn3008</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <copyright>© {year}</copyright><atom:link href="https://example.org/categories/index.xml" rel="self" type="application/rss+xml" />
+    <copyright>© {year}</copyright><atom:link href="https://jn3008.com/categories/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>

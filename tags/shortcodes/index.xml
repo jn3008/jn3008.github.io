@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>shortcodes on JN3008</title>
-    <link>https://example.org/tags/shortcodes/</link>
-    <description>Recent content in shortcodes on JN3008</description>
+    <title>shortcodes on jn3008</title>
+    <link>https://jn3008.com/tags/shortcodes/</link>
+    <description>Recent content in shortcodes on jn3008</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>© {year}</copyright>
-    <lastBuildDate>Fri, 05 Jun 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://example.org/tags/shortcodes/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 05 Jun 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://jn3008.com/tags/shortcodes/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Rich Content</title>
-      <link>https://example.org/blender/rich-text/</link>
+      <link>https://jn3008.com/blender/rich-text/</link>
       <pubDate>Fri, 05 Jun 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://example.org/blender/rich-text/</guid>
+      <guid>https://jn3008.com/blender/rich-text/</guid>
       <description>Hugo ships with several Built-in Shortcodesfor rich content, along with a Privacy Configand a set of Simple Shortcodes that enable static and no-JS versions of various social media embeds.
 Instagram Simple Shortcode YouTube Privacy Enhanced Shortcode   Twitter Simple Shortcode “In addition to being more logical, asymmetry has the advantage that its complete appearance is far more optically effective than symmetry.”
 — Jan Tschichold pic.twitter.com/gcv7SrhvJb
@@ -22,10 +22,10 @@ Instagram Simple Shortcode YouTube Privacy Enhanced Shortcode   Twitter Simple S
     
     <item>
       <title>Rich Content</title>
-      <link>https://example.org/blog/rich-text/</link>
+      <link>https://jn3008.com/blog/rich-text/</link>
       <pubDate>Fri, 05 Jun 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://example.org/blog/rich-text/</guid>
+      <guid>https://jn3008.com/blog/rich-text/</guid>
       <description>Hugo ships with several Built-in Shortcodesfor rich content, along with a Privacy Configand a set of Simple Shortcodes that enable static and no-JS versions of various social media embeds.
 Instagram Simple Shortcode YouTube Privacy Enhanced Shortcode   Twitter Simple Shortcode “In addition to being more logical, asymmetry has the advantage that its complete appearance is far more optically effective than symmetry.”
 — Jan Tschichold pic.twitter.com/gcv7SrhvJb
@@ -34,10 +34,10 @@ Instagram Simple Shortcode YouTube Privacy Enhanced Shortcode   Twitter Simple S
     
     <item>
       <title>Rich Content</title>
-      <link>https://example.org/processing/rich-text/</link>
+      <link>https://jn3008.com/processing/rich-text/</link>
       <pubDate>Fri, 05 Jun 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://example.org/processing/rich-text/</guid>
+      <guid>https://jn3008.com/processing/rich-text/</guid>
       <description>Hugo ships with several Built-in Shortcodesfor rich content, along with a Privacy Configand a set of Simple Shortcodes that enable static and no-JS versions of various social media embeds.
 Instagram Simple Shortcode YouTube Privacy Enhanced Shortcode   Twitter Simple Shortcode “In addition to being more logical, asymmetry has the advantage that its complete appearance is far more optically effective than symmetry.”
 — Jan Tschichold pic.twitter.com/gcv7SrhvJb

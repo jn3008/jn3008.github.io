@@ -1,73 +1,73 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Tags on JN3008</title>
-    <link>https://example.org/tags/</link>
-    <description>Recent content in Tags on JN3008</description>
+    <title>Tags on jn3008</title>
+    <link>https://jn3008.com/tags/</link>
+    <description>Recent content in Tags on jn3008</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>© {year}</copyright>
-    <lastBuildDate>Wed, 23 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://example.org/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 23 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://jn3008.com/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>hugo</title>
-      <link>https://example.org/tags/hugo/</link>
+      <link>https://jn3008.com/tags/hugo/</link>
       <pubDate>Wed, 23 Dec 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://example.org/tags/hugo/</guid>
+      <guid>https://jn3008.com/tags/hugo/</guid>
       <description></description>
     </item>
     
     <item>
       <title>css</title>
-      <link>https://example.org/tags/css/</link>
+      <link>https://jn3008.com/tags/css/</link>
       <pubDate>Fri, 05 Jun 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://example.org/tags/css/</guid>
+      <guid>https://jn3008.com/tags/css/</guid>
       <description></description>
     </item>
     
     <item>
       <title>html</title>
-      <link>https://example.org/tags/html/</link>
+      <link>https://jn3008.com/tags/html/</link>
       <pubDate>Fri, 05 Jun 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://example.org/tags/html/</guid>
+      <guid>https://jn3008.com/tags/html/</guid>
       <description></description>
     </item>
     
     <item>
       <title>markdown</title>
-      <link>https://example.org/tags/markdown/</link>
+      <link>https://jn3008.com/tags/markdown/</link>
       <pubDate>Fri, 05 Jun 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://example.org/tags/markdown/</guid>
+      <guid>https://jn3008.com/tags/markdown/</guid>
       <description></description>
     </item>
     
     <item>
       <title>math</title>
-      <link>https://example.org/tags/math/</link>
+      <link>https://jn3008.com/tags/math/</link>
       <pubDate>Fri, 05 Jun 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://example.org/tags/math/</guid>
+      <guid>https://jn3008.com/tags/math/</guid>
       <description></description>
     </item>
     
     <item>
       <title>shortcodes</title>
-      <link>https://example.org/tags/shortcodes/</link>
+      <link>https://jn3008.com/tags/shortcodes/</link>
       <pubDate>Fri, 05 Jun 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://example.org/tags/shortcodes/</guid>
+      <guid>https://jn3008.com/tags/shortcodes/</guid>
       <description></description>
     </item>
     
     <item>
       <title>themes</title>
-      <link>https://example.org/tags/themes/</link>
+      <link>https://jn3008.com/tags/themes/</link>
       <pubDate>Fri, 05 Jun 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://example.org/tags/themes/</guid>
+      <guid>https://jn3008.com/tags/themes/</guid>
       <description></description>
     </item>
     
