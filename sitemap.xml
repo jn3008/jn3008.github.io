@@ -23,17 +23,7 @@
   </url>
   
   <url>
-    <loc>https://jn3008.com/processing/</loc>
-    <lastmod>2020-12-23T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://jn3008.com/nfts/processing/</loc>
-    <lastmod>2020-12-23T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://jn3008.com/processing/processing/</loc>
     <lastmod>2020-12-23T00:00:00+00:00</lastmod>
   </url>
   
@@ -78,6 +68,11 @@
   </url>
   
   <url>
+    <loc>https://jn3008.com/processing/markdown-syntax-guide/</loc>
+    <lastmod>2020-06-05T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://jn3008.com/tags/math/</loc>
     <lastmod>2020-06-05T00:00:00+00:00</lastmod>
   </url>
@@ -99,6 +94,11 @@
   
   <url>
     <loc>https://jn3008.com/processing/math-typesetting/</loc>
+    <lastmod>2020-06-05T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://jn3008.com/processing/</loc>
     <lastmod>2020-06-05T00:00:00+00:00</lastmod>
   </url>
   
