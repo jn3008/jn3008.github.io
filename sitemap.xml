@@ -8,6 +8,16 @@
   </url>
   
   <url>
+    <loc>https://jn3008.com/blender/</loc>
+    <lastmod>2020-12-23T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://jn3008.com/blender/blender/</loc>
+    <lastmod>2020-12-23T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://jn3008.com/tags/hugo/</loc>
     <lastmod>2020-12-23T00:00:00+00:00</lastmod>
   </url>
@@ -23,18 +33,18 @@
   </url>
   
   <url>
-    <loc>https://jn3008.com/nfts/processing/</loc>
+    <loc>https://jn3008.com/processing/</loc>
+    <lastmod>2020-12-23T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://jn3008.com/processing/processing/</loc>
     <lastmod>2020-12-23T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://jn3008.com/tags/</loc>
     <lastmod>2020-12-23T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://jn3008.com/blender/</loc>
-    <lastmod>2020-06-05T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -58,17 +68,7 @@
   </url>
   
   <url>
-    <loc>https://jn3008.com/blender/markdown-syntax-guide/</loc>
-    <lastmod>2020-06-05T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://jn3008.com/blog/markdown-syntax-guide/</loc>
-    <lastmod>2020-06-05T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://jn3008.com/processing/markdown-syntax-guide/</loc>
     <lastmod>2020-06-05T00:00:00+00:00</lastmod>
   </url>
   
@@ -78,47 +78,12 @@
   </url>
   
   <url>
-    <loc>https://jn3008.com/blender/math-typesetting/</loc>
-    <lastmod>2020-06-05T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://jn3008.com/blog/math-typesetting/</loc>
     <lastmod>2020-06-05T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://jn3008.com/nfts/math-typesetting/</loc>
-    <lastmod>2020-06-05T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://jn3008.com/processing/math-typesetting/</loc>
-    <lastmod>2020-06-05T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://jn3008.com/processing/</loc>
-    <lastmod>2020-06-05T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://jn3008.com/blender/rich-text/</loc>
-    <lastmod>2020-06-05T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://jn3008.com/blog/rich-text/</loc>
-    <lastmod>2020-06-05T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://jn3008.com/nfts/rich-text/</loc>
-    <lastmod>2020-06-05T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://jn3008.com/processing/rich-text/</loc>
     <lastmod>2020-06-05T00:00:00+00:00</lastmod>
   </url>
   
@@ -138,17 +103,7 @@
   </url>
   
   <url>
-    <loc>https://jn3008.com/blender/example-post/</loc>
-    <lastmod>2020-06-04T09:19:29-04:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://jn3008.com/blog/example-post/</loc>
-    <lastmod>2020-06-04T09:19:29-04:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://jn3008.com/nfts/example-post/</loc>
     <lastmod>2020-06-04T09:19:29-04:00</lastmod>
   </url>
   
@@ -158,12 +113,11 @@
   </url>
   
   <url>
-    <loc>https://jn3008.com/processing/example-post/</loc>
-    <lastmod>2020-06-04T09:19:29-04:00</lastmod>
+    <loc>https://jn3008.com/categories/</loc>
   </url>
   
   <url>
-    <loc>https://jn3008.com/categories/</loc>
+    <loc>https://jn3008.com/p5.js/displayp5/</loc>
   </url>
   
 </urlset>
