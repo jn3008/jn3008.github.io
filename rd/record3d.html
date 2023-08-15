@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: hsl(0, 0%, 8%);
+        width: 100vw;
+        height: 100vh;
+    }
+
+    canvas {
+        box-shadow: 0 0 10px 0px #5f5f5f;
+    }
+
+    .lil-gui {
+        --width: 50%
+    }
+</style>
+
+<body>
+    <div id="container" style="
+            height: 100%;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;">
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/lil-gui@0.18.1/dist/lil-gui.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.js"></script>
+   
+    <script id="vertexShader" type="x-shader/x-vertex">
+        void main() {
+            gl_Position = vec4( position, 1.0 );
+        }
+    </script>
+    
+   
+    <script id="fragmentShaderOutput" type="x-shader/x-fragment">
+        uniform vec2 u_resolution;
+        uniform sampler2D u_tex;
+        uniform bool u_thresh;
+
+        #define tau 0.2
+
+        void main() {
+            vec2 uv = gl_FragCoord.xy/u_resolution.xy; 
+
+            vec3 col = texture2D(u_tex, uv).rgb;
+            if (u_thresh)
+                col = vec3(texture2D(u_tex, uv).g < tau ? 1.:0.);
+                         
+            gl_FragColor=vec4(col, 1.0);
+            
+        }
+    </script>
+    <script id="fragmentShaderReaction" type="x-shader/x-fragment">
+        uniform vec2 u_resolution;
+        uniform float u_time;
+        uniform vec2 u_mouse;
+        uniform bool u_drawing;
+        uniform bool u_mouse_controls_params;
+        uniform bool u_wrap;
+        uniform sampler2D u_tex;
+
+        uniform float u_f;
+        uniform float u_k;
+        uniform float u_Du;
+        uniform float u_Dv;
+        uniform float u_dt;
+
+        uniform float u_size;
+        
+        vec2 from3dto2d(vec3 p) {
+            return vec2(p.x,p.y + u_size*p.z);
+        }
+        vec2 from3dto2duv(vec3 p) {
+            return vec2(p.x/u_size, (p.y + u_size*p.z)/u_size/u_size);
+        }
+        vec3 from2dto3d(vec2 p) {
+            float y_ = mod(p.y,u_size);
+            float z_ = (p.y-y_)/u_size;
+            return vec3(p.x,y_,z_);
+        }
+
+        float ease(float p, float g) {
+            if (p < 0.5)
+              return 0.5 * pow(2.*p, g);
+            else
+              return 1. - 0.5 * pow(2.*(1. - p), g);
+          }
+
+        vec2 get_uv(vec3 p, vec3 dir) {
+            p += dir;
+
+            if (u_wrap)
+                p = mod(p+vec3(u_size),u_size);
+            else
+                if (p.x < 0.0 || p.x > u_size || p.y < 0.0 || p.y > u_size || p.z < 0.0 || p.z > u_size)
+                    return vec2(0.5,0.0);        
+
+            return texture2D(u_tex, from3dto2duv(p)).rg;
+        }
+
+        
+        float random (vec2 st) { // from bookofshaders
+            return fract(sin(dot(st.xy,
+            vec2(12.9898,78.233)))*
+            43758.5453123);
+        }
+
+        void main() {
+            vec2 pos = gl_FragCoord.xy;
+            vec2 r = u_resolution.xy;
+            vec2 m = u_mouse/u_resolution;
+
+            vec2 uv = pos/r;
+           
+            vec2 col = vec2(0.0,0.0);
+            if (u_time < .02) { // initial conditions, fill the center rectangle/cube
+                vec3 centered = abs(from2dto3d(pos)-vec3(u_size*0.5));
+                if (max(max(centered.x,centered.y),centered.z)/u_size < 0.1 ) {
+                    col = vec2(0.0, 1.0);
+                } else {
+                    col = vec2(1.0, 0.1*random(uv));
+                }             
+            } else {
+                float k = u_k;
+                float f = u_f;
+
+                vec3 pos3d = from2dto3d(pos);
+                vec2 co = from3dto2duv(pos3d);
+                
+                col = texture2D(u_tex, co).rg;
+
+                float u = col.r;
+                float v = col.g;
+
+                // perform laplacian with 3x3x3 convolution (27-point-stencil)
+                float weight1 = 2.0/88.0;
+                float weight2 = 3.0/88.0;
+                float weight3 = 6.0/88.0;
+                vec2 laplacian = vec2(-u, -v);
+                laplacian += weight1 * get_uv(pos3d, vec3(1,1,1));
+                laplacian += weight1 * get_uv(pos3d, vec3(1,1,-1));
+                laplacian += weight1 * get_uv(pos3d, vec3(1,-1,1));
+                laplacian += weight1 * get_uv(pos3d, vec3(1,-1,-1));
+                laplacian += weight1 * get_uv(pos3d, vec3(-1,1,1));
+                laplacian += weight1 * get_uv(pos3d, vec3(-1,1,-1));
+                laplacian += weight1 * get_uv(pos3d, vec3(-1,-1,1));
+                laplacian += weight1 * get_uv(pos3d, vec3(-1,-1,-1));
+
+                laplacian += weight2 * get_uv(pos3d, vec3(0,1,1));
+                laplacian += weight2 * get_uv(pos3d, vec3(0,1,-1));
+                laplacian += weight2 * get_uv(pos3d, vec3(0,-1,1));
+                laplacian += weight2 * get_uv(pos3d, vec3(0,-1,-1));
+
+                laplacian += weight2 * get_uv(pos3d, vec3(1,0,1));
+                laplacian += weight2 * get_uv(pos3d, vec3(1,0,-1));
+                laplacian += weight2 * get_uv(pos3d, vec3(-1,0,1));
+                laplacian += weight2 * get_uv(pos3d, vec3(-1,0,-1));
+
+                laplacian += weight2 * get_uv(pos3d, vec3(1,1,0));
+                laplacian += weight2 * get_uv(pos3d, vec3(1,-1,0));
+                laplacian += weight2 * get_uv(pos3d, vec3(-1,1,0));
+                laplacian += weight2 * get_uv(pos3d, vec3(-1,-1,0));
+
+                laplacian += weight3 * get_uv(pos3d, vec3(0,0,1));
+                laplacian += weight3 * get_uv(pos3d, vec3(0,0,-1));
+                laplacian += weight3 * get_uv(pos3d, vec3(0,1,0));
+                laplacian += weight3 * get_uv(pos3d, vec3(0,-1,0));
+                laplacian += weight3 * get_uv(pos3d, vec3(1,0,0));
+                laplacian += weight3 * get_uv(pos3d, vec3(-1,0,0)); 
+
+
+                float reaction = u*v*v;
+                float delta_u = (u_Du*laplacian.r - reaction + f*(1.0-u));
+                float delta_v = (u_Dv*laplacian.g + reaction - (f+k)*v);
+                u += delta_u;
+                v += delta_v;
+                
+                // just to be safe, restrict concentrations between 0 and 1
+                u = clamp(u, 0.0, 1.0);
+                v = clamp(v, 0.0, 1.0);
+
+                // allow the user to 'pour in' chemical by clicking and dragging the mouse
+                float brush_size = 5.0;
+                float mouse_src = step(length(pos - vec2(u_mouse.x, u_resolution.y-u_mouse.y)), brush_size) * float(u_drawing);
+                col = vec2(u, mix(v, 0.5, mouse_src));
+            }
+            
+            gl_FragColor = vec4(col, 0.0, 1.0);            
+        }
+    </script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.151.0/build/three.module.js"
+            }
+        }
+    </script> 
+    <script type="module">
+        import * as THREE from 'three';
+
+        var container;
+
+        var camera, scene, renderer, clock, controls;
+        var uniforms, uniforms_output, obj, material_reaction, material_output, mesh;
+        
+        var record = true; 
+        var reactions_per_frame = 120; 
+        var total_frames = 100;
+        var saved_frames = 0;
+        let texture_data_in;
+        let texture_data_out;
+        
+        let sim_size = 80; 
+
+        var f = 0.0559;
+        var k = 0.0674;
+        var scl = 0.5;
+        var Du = 1.0*scl;
+        var Dv = 0.5*scl;
+        var dt = 1.0; 
+
+        const init_data = new THREE.DataTexture()
+        init_data.needsUpdate = true;
+
+        function map_(value, start1, stop1, start2, stop2) {
+            return (value - start1) / (stop1 - start1) * (stop2 - start2) + start2;
+        }
+        function lerp(start, stop, value) {
+            return map_(value, 0, 1, start, stop);
+        }
+
+        const gui = new lil.GUI;
+
+        var get_im_data = false;
+        var play_pause = true;
+        var urls = []
+
+        init();
+        animate();
+        
+        function saveImage() {
+            get_im_data = true;
+        }
+        function playPause() {
+            play_pause = !play_pause;
+        }
+
+        function init() {
+            container = document.getElementById('container');
+
+            
+            camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 100 );
+            camera.position.set( 0, 0, 2 );
+
+            scene = new THREE.Scene();
+            clock = new THREE.Clock();
+
+            renderer = new THREE.WebGLRenderer();
+
+            texture_data_in = new THREE.WebGLRenderTarget(sim_size, sim_size*sim_size, {
+                minFilter: THREE.NearestFilter,
+                magFilter: THREE.NearestFilter,
+                format: THREE.RGBAFormat,
+                type: THREE.FloatType
+            });
+
+            texture_data_out = texture_data_in.clone();
+
+            var geometry = new THREE.PlaneGeometry(2, 2);
+
+            uniforms = {
+                u_time: { type: "f", value: 0.0 },
+                u_resolution: { type: "v2", value: new THREE.Vector2() },
+                u_mouse: { type: "v2", value: new THREE.Vector3() },
+                u_drawing: { type: "b", value: false },
+                u_mouse_controls_params: { type: "b", value: false },
+                u_tex: { type: "t", value: init_data },
+                u_wrap: {type: "b", value: false},
+                u_f: { type: "f", value: f },
+                u_k: { type: "f", value: k },
+                u_Du: { type: "f", value: Du },
+                u_Dv: { type: "f", value: Dv },
+                u_dt: { type: "f", value: dt },
+                u_size: {type: "f", value: sim_size}
+
+            };
+
+            uniforms_output = {
+                u_resolution: { type: "v2", value: new THREE.Vector2() },
+                u_tex: { type: "t", value: texture_data_out.texture },
+                u_thresh: {type: "b", value: true},
+                u_size: {type: "f", value: sim_size}
+            };
+
+
+            obj = {
+                gui_mouse_control: false,
+                gui_f: f,
+                gui_k: k,
+                gui_iterations: reactions_per_frame,
+                gui_wrap: false,
+                gui_thresh: true,
+                gui_rec: true,
+                gui_play_pause: playPause,
+                gui_save_im: saveImage,
+                gui_restart: do_restart
+            };
+
+
+            function set_mouse_controls(value) {
+                uniforms.u_mouse_controls_params.value = value;
+                if (value) {
+                    controller_f.disable();
+                    controller_k.disable();
+                } else {
+                    controller_f.enable();
+                    controller_k.enable();
+                }
+            }
+            function set_f(value) {
+                uniforms.u_f.value = value;
+            }
+            function set_k(value) {
+                uniforms.u_k.value = value;
+            }
+            function set_wrap(value) {
+                uniforms.u_wrap.value = value;
+            }
+            function set_thresh(value) {
+                uniforms_output.u_thresh.value = value;
+            }
+            function set_record(value) {
+                record = value;
+            }
+            function do_restart() {
+                saved_frames = 0;
+                uniforms.u_time.value = 0;
+            }
+
+            const controller_mouse = gui.add(obj, 'gui_mouse_control')
+                .name('Control parameters with mouse (m)')
+                .listen()
+                .onChange(value => set_mouse_controls(value));
+            const controller_f = gui.add(obj, 'gui_f', 0.002, 0.12)
+                .name('F')
+                .listen()
+                .onChange(value => set_f(value));
+            const controller_k = gui.add(obj, 'gui_k', 0.0141, 0.066)
+                .name('K')
+                .listen()
+                .onChange(value => set_k(value));
+            const controller_it = gui.add(obj, 'gui_iterations', 1, 50, 1)
+                .name('Reactions per frame')
+                .onChange(
+                    value => {
+                        reactions_per_frame = value;
+                    }
+                );
+            const controller_wrap = gui.add(obj, 'gui_wrap')
+                .name('Wrap borders (w)')
+                .listen()
+                .onChange(value => set_wrap(value));
+            const controller_thresh = gui.add(obj, 'gui_thresh')
+                .name('Threshold (t)')
+                .listen()
+                .onChange(value => set_thresh(value));
+            const controller_rec = gui.add(obj, 'gui_rec')
+                .name('Record (f)')
+                .listen()
+                .onChange(value => set_record(value));
+            const controller_play = gui.add(obj, 'gui_play_pause')
+                .name('Play / Pause (spacebar)');
+            const controller_save = gui.add(obj, 'gui_save_im')
+                .name('Save image (s)');
+            const controller_restart = gui.add(obj, 'gui_restart')
+                .name('Restart (r)');
+
+            // gui.close()
+
+            material_reaction = new THREE.ShaderMaterial({
+                uniforms: uniforms,
+                vertexShader: document.getElementById('vertexShader').textContent,
+                fragmentShader: document.getElementById('fragmentShaderReaction').textContent
+            });
+
+
+            material_output = new THREE.ShaderMaterial({
+                uniforms: uniforms_output,
+                vertexShader: document.getElementById('vertexShader').textContent,
+                fragmentShader: document.getElementById('fragmentShaderOutput').textContent
+            });
+
+            mesh = new THREE.Mesh(geometry, material_output);
+            scene.add(mesh);
+
+            container.appendChild(renderer.domElement);
+
+            onWindowResize();
+
+            document.onmousemove = function (e) {
+
+                uniforms.u_mouse.value.x = e.clientX - renderer.domElement.offsetLeft;
+                uniforms.u_mouse.value.y = e.clientY - renderer.domElement.offsetTop;
+
+                let mx = uniforms.u_mouse.value.x / renderer.domElement.width;
+                let my = uniforms.u_mouse.value.y / renderer.domElement.height;
+
+                if (uniforms.u_mouse_controls_params.value) {
+                    obj.gui_f = lerp(0.002, 0.12, Math.min(Math.max(1 - my, 0), 1));
+                    let k_min = -7.919 * Math.pow(obj.gui_f - 0.0686, 2.0) + 0.0599;
+                    let k_max = -3.418 * Math.pow(obj.gui_f - 0.0536, 2.0) + 0.066;
+                    obj.gui_k = lerp(k_min, k_max, mx);
+
+                    set_f(obj.gui_f);
+                    set_k(obj.gui_k);
+                }
+            }
+            document.onmousedown = function () {
+                uniforms.u_drawing.value = true;
+            }
+            document.onmouseup = function () {
+                uniforms.u_drawing.value = false;
+            }
+            document.onkeydown = function (e) {
+                if (e.keyCode === 77) { // if 'm' is pressed
+                    obj.gui_mouse_control = !obj.gui_mouse_control;
+                    set_mouse_controls(obj.gui_mouse_control);
+                }
+                if (e.keyCode === 83) { // if 's' is pressed
+                    saveImage();
+                }
+                if (e.keyCode === 32) { // if spacebar is pressed
+                    playPause();
+                }
+                if (e.keyCode === 87) { // if 'w' is pressed
+                    obj.gui_wrap = !obj.gui_wrap;
+                    set_wrap(obj.gui_wrap);
+                }
+                if (e.keyCode === 82) { // if 'r' is pressed
+                    do_restart();
+                }
+                if (e.keyCode === 70) { // if 'f' is pressed
+                    set_record();
+                }
+                if (e.keyCode === 84) { // if 't' is pressed
+                    obj.gui_thresh = !obj.gui_thresh;
+                    set_thresh(obj.gui_thresh);
+                }
+            }
+        }
+
+        function onWindowResize(event) {
+            let width = sim_size;
+            let height = sim_size*sim_size;
+
+            renderer.setSize(width, height);
+            uniforms.u_resolution.value.x = renderer.domElement.width;
+            uniforms.u_resolution.value.y = renderer.domElement.height;
+            uniforms_output.u_resolution.value.x = renderer.domElement.width;
+            uniforms_output.u_resolution.value.y = renderer.domElement.height;
+
+            texture_data_in.setSize(width, height);
+            texture_data_out.setSize(width, height);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            render();
+        }
+
+        function render() {
+            uniforms.u_time.value += clock.getDelta();
+
+            mesh.material = material_reaction;
+
+            if (play_pause)
+                for (var i = 0; i < reactions_per_frame; i++) {
+                    renderer.setRenderTarget(texture_data_out);
+                    renderer.render(scene, camera);
+                    renderer.setRenderTarget(null);
+
+                    let tmp = texture_data_out;
+                    texture_data_out = texture_data_in;
+                    texture_data_in = tmp;
+
+                    mesh.material.uniforms.u_tex.value = texture_data_in.texture;
+                }
+
+            mesh.material = material_output;
+
+            renderer.render(scene, camera);
+
+            if (get_im_data) { // if 's' is pressed to save an image
+                let img_data = renderer.domElement.toDataURL('image/jpeg', 1.0);
+
+                var link = document.createElement('a');
+
+                link.setAttribute('href', img_data);
+                link.setAttribute('target', '_blank');
+                link.setAttribute('download', "rd3d_f" + (uniforms.u_f.value) + "_k" + (uniforms.u_k.value) + ".png");
+
+                link.click();
+                get_im_data = false;
+            }
+
+            if (record) {
+                if (saved_frames < total_frames) {
+                    let img_data = renderer.domElement.toDataURL('image/jpeg', 1.0);
+                    urls.push(img_data);
+                    saved_frames++;
+                } else if (saved_frames === total_frames) {
+                    const zip = new JSZip();
+
+                    let count = 0;
+                    urls.forEach((url) => {
+                        const blobPromise = fetch(url).then((r) => {
+                            if (r.status === 200) return r.blob();
+                            return Promise.reject(new Error(r.statusText));
+                        });
+                        const name = "z" + (count).toString().padStart(3, "0") + ".png";
+                        zip.file(name, blobPromise);
+                        count++;
+                    });
+                    
+                    let filename = "frames3d_r" + (reactions_per_frame) + "_f" + (uniforms.u_f.value) + "_k" + (uniforms.u_k.value) + "_s" + (sim_size.toString()) + ".zip"
+                    zip.generateAsync({ type: "blob" }).then((blob) => saveAs(blob, filename));
+
+                    saved_frames++;
+                }
+            }
+
+        }
+    </script>
+</body>
+
+</html>
