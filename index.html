@@ -392,53 +392,22 @@ if (!doNotTrack) {
               vec2 uv = pos/r;
 
 
-              
-              
-              
-              
-              
-              
-              
-              
 
               float scl = 140.0;
               vec3 starpos = scl*(vec3(pos/r.x * 2.0f - 1.0f, 1.0f)); 
-              
               float stars_threshold = 8.0f; 
               float easeval = 1.0;
               vec3 displace = 0.0*vec3(0.0,u_time*m.y*5.,0.0);
-              
-              
-              float stars = 160.0*ease(pow(clamp(noise(starpos+displace), 0.0f, 1.0f), stars_threshold), easeval);
-              stars *= mix(0.2, 1.8, ease(mapp(noise(starpos * scl*0.2-displace + 0.8*vec3(u_time)),-0.0,1.0,0.0,1.0), 1.0)); 
-	
+              float stars1 = 160.0*ease(pow(clamp(noise(starpos+displace), 0.0f, 1.0f), stars_threshold), easeval);
+              float stars2 = 160.0*ease(pow(clamp(noise(starpos+displace+vec3(0.0,0.0,100.0)), 0.0f, 1.0f), stars_threshold), easeval);
+              stars1 *= mix(0.2, 1.8, ease(mapp(noise(starpos * scl*0.2-displace + 0.8*vec3(u_time)),-0.0,1.0,0.0,1.0), 1.0)); 
+              stars2 *= mix(0.2, 1.8, ease(mapp(noise(starpos * scl*0.2-displace + 0.8*vec3(u_time)),-0.0,1.0,0.0,1.0), 1.0)); 
 
+              stars1 = clamp(stars1,0.0,1.0);
+              stars2 = clamp(stars2,0.0,1.0);
 
-              
-              
-              
-              
-              
-              
-              
-              
-              
-              
-              
-              
-              
-              
-              
-              
-              
-              
-              
-              
-              gl_FragColor = vec4(vec3(stars),1.0);
-          }
-          
-
-          `
+              gl_FragColor = mix(vec4(vec3(-stars1),stars1),vec4(stars2),1.0-pow(1.0-stars2,8.0));
+          }`
       });
 
 
