@@ -281,27 +281,29 @@ if (!doNotTrack) {
     import * as THREE from 'three';
 
     
-    import { GPUStatsPanel } from 'three/addons/utils/GPUStatsPanel.js';
+    
 
-    import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+    
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-    import { Line2 } from 'three/addons/lines/Line2.js';
-    import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
-    import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
-    import * as GeometryUtils from 'three/addons/utils/GeometryUtils.js';
+    
+    
+    
+    
 
     let line, renderer, scene, camera, controls, container;
     let line1;
     let matLine, matLineBasic, matLineDashed;
     
     let gui;
-    let bg_grid_size;
+    let bg_grid_size, bg_dim;
 
     
     let insetWidth;
     let insetHeight;
 
     let global_scale, global_scroll_amt;
+    
+    const frustumSize = 50; 
 
 
     const special_constant = 0.6154797086703873410674645891239936;
@@ -310,7 +312,7 @@ if (!doNotTrack) {
     animate();
 
     function init() {
-        bg_grid_size = 6;
+        bg_grid_size = 10;
         update_global_scale();
         global_scroll_amt = 0.0;
 
@@ -327,8 +329,9 @@ if (!doNotTrack) {
 
         scene.add(new THREE.AmbientLight(0xffffff));
 
-        camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 1000);
         
+        const aspect = window.innerWidth / window.innerHeight;
+        camera = new THREE.OrthographicCamera(frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 0.1, 100);
         camera.position.set(0, 0, 60);
 
 
@@ -365,7 +368,7 @@ if (!doNotTrack) {
     }
 
     function init_background() {
-
+        let bg_spheres = []
         let m = bg_grid_size;
         for (let i = -m; i < m + 1; i++)
             for (let j = -m; j < m + 1; j++)
@@ -377,13 +380,17 @@ if (!doNotTrack) {
                     const geometry = new THREE.SphereGeometry(0.2, 10, 10);
                     const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
                     const sphere = new THREE.Mesh(geometry, material);
-                    console.log(v);
+                    
                     sphere.position.set(v.x, v.y, v.z);
                     
+                    bg_spheres.push(sphere);
                     scene.add(sphere);
 
                 }
 
+        let bound_max = new THREE.Vector2(Math.max(...bg_spheres.map(s => s.position.x)), Math.max(...bg_spheres.map(s => s.position.y)));
+        let bound_min = new THREE.Vector2(Math.min(...bg_spheres.map(s => s.position.x)), Math.min(...bg_spheres.map(s => s.position.y)));
+        bg_dim = bound_max.sub(bound_min);
     }
 
     function in_grid(i, j, rad) {
@@ -423,21 +430,27 @@ if (!doNotTrack) {
     }
 
     function onWindowResize() {
+        
 
-        camera.aspect = window.innerWidth / window.innerHeight;
+        const aspect = window.innerWidth / window.innerHeight;
+
+
+        camera.left = - frustumSize * aspect / 2;
+        camera.right = frustumSize * aspect / 2;
+        camera.top = frustumSize / 2;
+        camera.bottom = - frustumSize / 2;
+
+
         camera.updateProjectionMatrix();
 
         renderer.setSize(window.innerWidth, window.innerHeight);
-
-        insetWidth = window.innerHeight / 4; 
-        insetHeight = window.innerHeight / 4;
-
-        update_global_scale();
+    
+        
 
     }
 
     function update_global_scale() {
-        global_scale = 0.1 * Math.sqrt(window.innerWidth * window.innerWidth + window.innerHeight * window.innerHeight) / (2 * bg_grid_size + 1);
+        global_scale = 0.2 * Math.sqrt(window.innerWidth * window.innerWidth + window.innerHeight * window.innerHeight) / (2 * bg_grid_size + 1);
     }
 
     function animate() {
