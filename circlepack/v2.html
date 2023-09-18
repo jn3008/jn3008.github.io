@@ -51,8 +51,9 @@
 
 
                 for (let l of list) {
-                    if (l == 0) C.growA();
-                    else if (l == 1) C.growB(0);
+                    const ll = p.random(1) < 0.7 ? l : 1-l; // small chance to flip the instruction
+                    if (ll == 0) C.growA();
+                    else if (ll == 1) C.growB(0);
                     else
                         for (let i = 0; i < 30; i++) C.fixOverlap();
                 }
@@ -93,6 +94,7 @@
             let sCol = 0; //swirls
             let mCol = 0; //light dark mode
             let rCol = 0; //radius computation
+            let pCol = 0; //polygon boundary
             let t = 0;
             let red = p.color('#e30800');
 
@@ -150,12 +152,12 @@
                 p.noFill();
                 // C.display(zoom);
                 Cb.display(zoom);
-                if (active2 > 0) {
-                    C.fixOverlap();
-                }
+                // if (active2 > 0) {
+                //     C.fixOverlap();
+                // }
                 if (active1 > 0) {
-                    C.calcRad();
-                    C.calcPos();
+                    // C.calcRad();
+                    // C.calcPos();
                     Cb.calcRad();
                     Cb.calcPos();
                 }
@@ -180,6 +182,7 @@
                 hCol *= ease;
                 sCol *= ease;
                 mCol *= 0.85;
+                pCol *= ease;
             }
 
             function writeText() {
@@ -211,6 +214,8 @@
                 p.textAlign(p.LEFT, p.BOTTOM);
                 p.textSize(17);
                 
+                p.fill(fg, p.lerp(100, 255, pCol));
+                p.text("Press a number (3-9) to make n-gon boundary", margin, p.height - margin - 80);
                 p.fill(fg, p.lerp(100, 255, hCol));
                 p.text("Press 'h' to hide edges", margin, p.height - margin - 60);
                 p.fill(fg, p.lerp(100, 255, sCol));
@@ -244,10 +249,14 @@
                 } else if (p.key === 'm') {
                     mode = !mode;
                     mCol = 1;
+                } else if (parseInt(p.key) >= 3 && parseInt(p.key) <= 9) {
+                    pCol = 1;
+                    C.setPolygon(parseInt(parseInt(p.key)));
+                    active1 = 100;
                 } else {
                     rCol = 1;
                     active1 = 10;
-                }
+                } 
             }
             p.mouseWheel = function (event) {
                 let amt = 0.0003;
@@ -419,6 +428,20 @@
                     this.edges.push(new Edge(0, 2));
                     this.tries = 0;
                     this.boundVerts = [];
+                }
+
+                setPolygon(n) {
+                    let boundaries = this.boundVerts.length;
+                    for (let i = 0; i < boundaries; i++) {
+                        this.boundVerts[i].targetAng = p.PI;
+                    }
+                    let offset = p.random(boundaries/n);
+                    for (let i = 0; i < n; i++) {
+                        let idx = p.round(offset + (i + p.random(0.3))*boundaries/n)
+                        this.boundVerts[idx%boundaries].targetAng = (n-2)*p.PI/n;
+                    }
+                    
+
                 }
                
                 findBoundVerts() {
@@ -894,9 +917,15 @@
                     
                     let bound_max = p.createVector(Math.max(...this.verts.map(v => v.p.x + v.r)), Math.max(...this.verts.map(v => v.p.y + v.r)));
                     let bound_min = p.createVector(Math.min(...this.verts.map(v => v.p.x - v.r)), Math.min(...this.verts.map(v => v.p.y - v.r)));
+                    let margin = 50;
+                    let scale = 0.02*Math.min((p.width-margin*2)/(bound_max.x-bound_min.x), (p.height-margin*2)/(bound_max.y-bound_min.y));
+                    // let scale = (p.height-margin*2)/(bound_max.y-bound_min.y);
+                    // console.log(p.height-margin*2, bound_max.y-bound_min.y, scale);
 
                     for (let v of this.verts) {
                         v.p.add(- bound_min.x * 0.5 - bound_max.x * 0.5, - bound_min.y * 0.5 - bound_max.y * 0.5)
+                        v.p.mult(scale);
+                        v.r *= scale;
                     }
                 }
 
