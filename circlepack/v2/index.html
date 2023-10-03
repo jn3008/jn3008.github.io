@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<!-- https://editor.p5js.org/joseffn/sketches/yJMr-vFOL -->
+<html>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alice&family=Mooli">
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: hsl(0, 0%, 8%);
+        width: 100vw;
+        height: 100vh;
+        font-family: 'Mooli';
+    }
+
+    canvas {
+        box-shadow: 0 0 10px 0px #000000;
+    }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"
+    integrity="sha512-bcfltY+lNLlNxz38yBBm/HLaUB1gTV6I0e+fahbF9pS6roIdzUytozWdnFV8ZnM6cSAG5EbmO0ag0a/fLZSG4Q=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<body>
+    <div id="container" style="
+            height: 100%;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;">
+    </div>
+
+    <script>
+
+        //by Joseff N
+
+
+        let sketch = function (p) {
+            let C; //C is a complex triangulating a topological disc
+            let Cb;
+            let selected = 0;
+
+            let margin = 0;
+
+            p.setup = function () {
+                p.textFont('Mooli');
+
+                p.createCanvas(p.windowWidth - margin * 2, p.windowHeight - margin * 2);
+
+                C = new Complex();
+                list = [0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2]
+
+
+                for (let l of list) {
+                    const ll = p.random(1) < 0.7 ? l : 1-l; // small chance to flip the instruction
+                    if (ll == 0) C.growA();
+                    else if (ll == 1) C.growB(0);
+                    else
+                        for (let i = 0; i < 30; i++) C.fixOverlap();
+                }
+
+                C.makeValid();
+
+                for (let i = 0; i < 30; i++)
+                    C.calcRad();
+                C.calcPos();
+
+
+                Cb = new ComplexBoundary(C);
+
+                for (let i = 0; i < 30; i++)
+                    Cb.calcRad();
+                Cb.calcPos();
+                Cb.findBoundVerts()
+
+
+                p.ellipseMode(p.RADIUS);
+                center = p.createVector();
+                centerVel = p.createVector();
+                twistAngle = p.TAU * 0.5;
+
+            }
+            
+            p.windowResized = function() {
+                p.resizeCanvas(p.windowWidth - margin * 2, p.windowHeight - margin * 2);
+            }
+            var active1 = 0, active2 = 0;
+            var center, centerVel, locations = [], font;
+            var zoom = 35, hide = false, animate = false, mode = true, twistAngle;
+            let fg0 = 245, lg0 = 170, bg0 = 0;
+            let fg1 = 0, lg1 = 100, bg1 = 245;
+            let fg=fg0, lg=lg0, bg=bg0;
+            
+            let hCol = 0; //hide edges
+            let sCol = 0; //swirls
+            let mCol = 0; //light dark mode
+            let rCol = 0; //radius computation
+            let pCol = 0; //polygon boundary
+            let t = 0;
+            let red = p.color('#e30800');
+
+            p.draw = function () { //function draw() {
+                fg = p.lerp(fg0,fg1,mode?mCol:1-mCol);
+                bg = p.lerp(bg0,bg1,mode?mCol:1-mCol);
+                lg = p.lerp(lg0,lg1,mode?mCol:1-mCol);
+
+                let amt = 0.01
+                let len = Cb.boundVerts.length
+                if (p.keyIsDown(p.UP_ARROW)) {
+                    for (let i = 0; i < len; i++) {
+                        if (i == selected) {
+                            Cb.boundVerts[i].targetAng -= amt;
+                        } else {
+                            Cb.boundVerts[i].targetAng += amt / (len - 1)
+                        }
+                        if (Cb.boundVerts[i].targetAng > p.TAU) {
+                            Cb.doOwe(p.TAU - Cb.boundVerts[i].targetAng, i)
+                        } else if (Cb.boundVerts[i].targetAng < 0) {
+                            Cb.doOwe(-Cb.boundVerts[i].targetAng, i)
+                        }
+                        Cb.calcRad();
+                    }
+                    Cb.calcPos();
+                }
+                if (p.keyIsDown(p.DOWN_ARROW)) {
+                    for (let i = 0; i < len; i++) {
+                        if (i == selected) {
+                            Cb.boundVerts[i].targetAng += amt;
+                        } else {
+                            Cb.boundVerts[i].targetAng -= amt / (len - 1)
+                        }
+                        if (Cb.boundVerts[i].targetAng > p.TAU) {
+                            Cb.doOwe(p.TAU - Cb.boundVerts[i].targetAng, i)
+                        } else if (Cb.boundVerts[i].targetAng < 0) {
+                            Cb.doOwe(-Cb.boundVerts[i].targetAng, i)
+                        }
+                        Cb.calcRad();
+                    }
+                    Cb.calcPos();
+                }
+
+
+                t += 0.005;
+                t %= 1;
+                twistAngle = p.TAU; //p.TAU * lerp(-1, 1, mouseX / width);
+
+                p.background(bg);
+
+                writeText();
+                p.translate(p.width * 0.5 + center.x * zoom, p.height * 0.5 + center.y * zoom);
+                p.stroke(fg);
+                p.strokeWeight(1);
+                p.noFill();
+                // C.display(zoom);
+                Cb.display(zoom);
+                // if (active2 > 0) {
+                //     C.fixOverlap();
+                // }
+                if (active1 > 0) {
+                    // C.calcRad();
+                    // C.calcPos();
+                    Cb.calcRad();
+                    Cb.calcPos();
+                }
+
+                if (p.mouseIsPressed) {
+                    mouseLoc = p.createVector(p.mouseX, p.mouseY);
+                    locations.push(mouseLoc);
+                    if (locations.length > 2) locations.splice(0, 1);
+                    let v1 = locations[0].copy();
+                    let v2 = locations[locations.length - 1].copy();
+                    let mouseSpeed = p.min(v2.copy().sub(v1).mag() * 0.1, 1 / zoom);
+                    centerVel = v2.sub(v1).mult(mouseSpeed);
+                } else {
+                    locations = [];
+                }
+                active1 = p.max(0, active1 - 1);
+                active2 = p.max(0, active2 - 1);
+                centerVel.mult(0.92);
+                center.add(centerVel);
+                let ease = 0.93;
+                rCol *= ease;
+                hCol *= ease;
+                sCol *= ease;
+                mCol *= 0.85;
+                pCol *= ease;
+            }
+
+            function writeText() {
+                p.textSize(20);
+                let margin = 10;
+                p.noStroke();
+                p.textAlign(p.RIGHT, p.TOP);
+                p.textSize(20);
+                p.fill(fg);
+                p.text("Error: " + C.error, p.width - margin, margin);
+                p.text("Interior Vertices: " + C.countInt(), p.width - margin, margin + 30);
+                p.text("Boundary Vertices: " + C.countExt(), p.width - margin, margin + 60);
+                p.fill(red);
+                let v = Cb.boundVerts[selected].targetAng
+                v = p.round(v * 1000)
+                let vv = v.toString()
+                v /= 1000
+                v = v.toString();
+                if (vv[vv.length - 1] == 0) {
+                    v = v + "0"
+                    if (vv[vv.length - 2] == 0) {
+                        v = v + "0"
+                        if (vv[vv.length - 3] == 0) {
+                            v = v + "0"
+                        }
+                    }
+                }
+                p.text("Boundary angle sum target: " + v + "rad", p.width - margin, margin + 90);
+                p.textAlign(p.LEFT, p.BOTTOM);
+                p.textSize(17);
+                
+                p.fill(fg, p.lerp(100, 255, pCol));
+                p.text("Press a number (3-9) to make n-gon boundary", margin, p.height - margin - 80);
+                p.fill(fg, p.lerp(100, 255, hCol));
+                p.text("Press 'h' to hide edges", margin, p.height - margin - 60);
+                p.fill(fg, p.lerp(100, 255, sCol));
+                p.text("Press 's' for swirls", margin, p.height - margin - 40);
+                p.fill(fg, p.lerp(100, 255, mCol));
+                p.text("Press 'm' to alternate light and dark mode", margin, p.height - margin - 20);
+                p.fill(fg, p.lerp(100, 255, rCol));
+                p.text("Press any key to compute radii", margin, p.height - margin);
+                p.textAlign(p.RIGHT, p.BOTTOM);
+                p.fill(fg, 120);
+                p.text("Drag to pan, scroll to zoom", p.width - margin, p.height - margin);
+                p.text("Use left and right arrow keys to cycle through boundary circles", p.width - margin, p.height - margin - 40);
+                p.text("Use up and down arrow keys to adjust the target angle sum", p.width - margin, p.height - margin - 20);
+            }
+            p.keyPressed = function () {
+                if (p.key === 'ArrowRight') {
+                    selected += 1
+                    selected %= Cb.boundVerts.length
+                } else if (p.key === 'ArrowLeft') {
+                    selected += Cb.boundVerts.length - 1
+                    selected %= Cb.boundVerts.length
+                }
+            }
+            p.keyTyped = function () {
+                if (p.key === 'h') {
+                    hide = !hide;
+                    hCol = 1;
+                } else if (p.key === 's') {
+                    animate = !animate;
+                    sCol = 1;
+                } else if (p.key === 'm') {
+                    mode = !mode;
+                    mCol = 1;
+                } else if (parseInt(p.key) >= 3 && parseInt(p.key) <= 9) {
+                    pCol = 1;
+                    C.setPolygon(parseInt(parseInt(p.key)));
+                    active1 = 100;
+                } else {
+                    rCol = 1;
+                    active1 = 10;
+                } 
+            }
+            p.mouseWheel = function (event) {
+                let amt = 0.0003;
+                zoom = p.pow(zoom, 1 - event.delta * amt);
+            }
+            function range(a) {
+                return range_(0, a);
+            }
+            function range_(a, b) {
+                len = p.abs(b - a);
+                list = [];
+                for (let i = 0; i < len; i++)
+                    list[i] = p.round(p.map(i, 0, len, a, b));
+                return list;
+            }
+            let vId = 0;
+            class Vertex {
+                constructor(petals_) {
+                    this.petals = petals_;
+                    this.p = p.createVector(0, 0);
+                    this.interior = false;
+                    this.id = vId;
+                    vId++;
+                    this.r = 1.5 + p.sin(this.id * 4 + p.random(p.PI));
+                    this.tries = 0;
+                    this.targetAng = p.TAU
+                }
+                overlapsAny(verts) {
+                    for (let v of verts) {
+                        if (v.id == this.id) continue;
+                        if (this.overlaps(v)) return true;
+                    }
+                    return false;
+                }
+                overlaps(v) {
+                    if ((this.r + v.r) * 0.99 > this.p.dist(v.p)) {
+                        // print(this.id + ", " + v.id);
+                        // print(this.r + v.r + ", " + this.p.dist(v.p));
+                        return true;
+                    }
+                    return false;
+                }
+                equals(o) {
+                    if (o.id == this.id) return true
+                    return false;
+                }
+                cycle(n) {
+                    for (let i in range(n)) this.cycle_();
+                }
+                cycle_() {
+                    let hold = this.petals[0];
+                    this.petals.splice(0, 1); //remove 0'th element
+                    this.petals.push(hold); //add it to the end
+                }
+                normaliseOrder(edges) {
+                    if (this.interior || this.petals.length < 3) return;
+                    let p1 = -1;
+                    let p2 = -1;
+                    for (let e of edges) {
+                        if (e.interior) continue;
+                        if (e.verts[0] == this.id || e.verts[1] == this.id)
+                            p1 = e.verts[e.verts[0] == this.id ? 1 : 0];
+                    }
+                    for (let e of edges) {
+                        if (e.interior) continue;
+                        if (e.verts[0] == this.id)
+                            if (e.verts[1] != p1)
+                                p2 = e.verts[1];
+                        if (e.verts[1] == this.id)
+                            if (e.verts[0] != p1)
+                                p2 = e.verts[0];
+                    }
+
+
+                    let ip1 = this.petals.indexOf(p1); //indexOf(this.petals, p1);
+                    let ip2 = this.petals.indexOf(p2); //indexOf(this.petals, p2);
+                    let n = this.petals.length;
+                    let v1 = (ip2 - ip1 + n) % n;
+                    let v2 = (ip1 - ip2 + n) % n;
+
+                    let focus = -1;
+                    if (v1 == 1) focus = ip2;
+                    else {
+                        focus = ip1;
+                        if (v2 != 1) print("uh ohhhhhhhhhhhhhhhhhhhhhhhhhh");
+                    }
+                    this.cycle(focus);
+                }
+            }
+
+            class Edge {
+                constructor(a, b) {
+                    this.verts = [a, b];
+                    this.interior = false;
+                    this.length = p.random(0.4, 0.7);
+                    this.offset = p.random(0, 1);
+                }
+                show() {
+                    let v1 = C.verts[this.verts[0]];
+                    let v2 = C.verts[this.verts[1]];
+                    if (!this.onScreen(v1, v2))
+                        return;
+                    let n = 30;//constrain(round(25*zoom*0.06), 2, 40);
+
+                    for (let i in range(2)) {
+                        let A = this.offset + t - i;
+                        let B = this.offset + t + this.length - i;
+                        if (A > 1) {
+                            A -= 2;
+                            B -= 2;
+                        }
+                        if (B < 0) continue;
+                        A = p.max(A, 0);
+                        B = p.min(B, 1);
+                        let start = this.pos(v1, v2, A);
+                        let mid = this.pos(v1, v2, 0.5);
+                        let end = this.pos(v1, v2, B);
+                        p.beginShape();
+                        p.vertex(start.x, start.y);
+                        for (let i = 0; i < n; i++) {
+                            let param = p.lerp(A, B, i / (n - 1));
+                            let v = this.pos(v1, v2, param);
+                            // stroke(255);
+                            p.curveVertex(v.x, v.y);
+                        }
+                        p.vertex(end.x, end.y);
+                        p.endShape();
+                    }
+                }
+                onScreen(v1, v2) {
+                    let cc = p.mouseX / p.width;
+                    let hor1 = p.abs(v1.p.x + center.x) - v1.r;
+                    let hor2 = p.abs(v2.p.x + center.x) - v2.r;
+                    let ver1 = p.abs(v1.p.y + center.y) - v1.r;
+                    let ver2 = p.abs(v2.p.y + center.y) - v2.r;
+                    if ((hor1 * zoom > p.width * 0.5 && hor2 * zoom > p.width * 0.5) || (ver1 * zoom > p.height * 0.5 && ver2 * zoom > p.height * 0.5))
+                        return false;
+                    return true;
+                }
+                pos(v1, v2, q) {
+                    // q%=1;
+                    let r1 = v1.r;
+                    let r2 = v2.r;
+                    let p1 = v1.p;
+                    let p2 = v2.p;
+                    // let t1 = v1.twistIntensity;
+                    // let t2 = v2.twistIntensity;
+                    let retVal = p1.copy().sub(p2).normalize();
+                    if (2 * q < 1) {
+                        retVal.mult(p.lerp(0, r1, 2 * q)).rotate(twistAngle * (1 - 2 * q) - p.HALF_PI * 0 + p.PI).add(p1);
+                    } else {
+                        retVal.mult(p.lerp(r2, 0, 2 * q - 1)).rotate(twistAngle * (2 * q - 1) + p.PI * 0).add(p2);
+                    }
+
+                    return retVal.mult(zoom);
+                }
+            }
+
+            class Complex {
+                constructor() {
+                    this.error = 0;
+                    this.verts = [];
+                    this.edges = [];
+                    this.verts.push(new Vertex([1, 2]));
+                    this.verts.push(new Vertex([2, 0]));
+                    this.verts.push(new Vertex([0, 1]));
+                    this.edges.push(new Edge(0, 1));
+                    this.edges.push(new Edge(2, 1));
+                    this.edges.push(new Edge(0, 2));
+                    this.tries = 0;
+                    this.boundVerts = [];
+                }
+
+                setPolygon(n) {
+                    let boundaries = this.boundVerts.length;
+                    for (let i = 0; i < boundaries; i++) {
+                        this.boundVerts[i].targetAng = p.PI;
+                    }
+                    let offset = p.random(boundaries/n);
+                    for (let i = 0; i < n; i++) {
+                        let idx = p.round(offset + (i + p.random(0.3))*boundaries/n)
+                        this.boundVerts[idx%boundaries].targetAng = (n-2)*p.PI/n;
+                    }
+                    
+
+                }
+               
+                findBoundVerts() {
+                    this.boundVerts = []
+                    let count = 0;
+                    for (let v of this.verts) {
+                        if (!v.interior) {
+                            if (count < 1)
+                                this.boundVerts.push(v)
+                            count += 1
+                        }
+                    }
+
+                    while (this.boundVerts.length < count)
+                        this.boundVerts.push(this.verts[this.boundVerts[this.boundVerts.length - 1].petals[0]])
+                }
+                makeValid() {
+                    let keepGoing = true;
+                    while (keepGoing) {
+                        let count = 0
+                        for (let b of this.boundVerts) {
+                            if (b.petals.length < 3) {
+                                count += 1
+                                this.growB_(this.verts[b.petals[0]]);
+                            }
+                        }
+                        if (count < 1) keepGoing = false;
+                    }
+                }
+                growA() {
+                    var v = new Vertex([]);
+                    this.verts.push(v);
+                    let idx = p.floor(p.random(this.edges.length));
+                    let not_good_enough = true;
+                    // let give_up = 0;
+                    while (not_good_enough) { //} && give_up < 50) {
+                        // give_up++;
+                        idx = p.floor(p.random(this.edges.length));
+                        if (!this.edges[idx].interior) not_good_enough = false;
+                        // print(give_up);
+                        // print(idx+" / "+this.edges.length)
+                        // print(this.edges[idx].interior);
+                    }
+
+                    let P = this.edges[idx].verts[0];
+                    let Q = this.edges[idx].verts[1];
+                    this.edges.push(new Edge(v.id, P));
+                    this.edges.push(new Edge(v.id, Q));
+                    this.edges[idx].interior = true;
+                    // print(P+" before, "+this.verts[P].petals);
+                    // print(Q+" before, "+this.verts[Q].petals);
+                    this.verts[P].petals.push(v.id);
+                    this.verts[Q].petals.push(v.id);
+                    this.verts[P].normaliseOrder(this.edges);
+                    this.verts[Q].normaliseOrder(this.edges);
+                    // print(P+" after, "+this.verts[P].petals);
+                    // print(Q+" after, "+this.verts[Q].petals);
+
+                    let left = -1;
+                    let right = -1;
+                    if (this.verts[this.edges[idx].verts[0]].petals[0] == v.id) {
+                        right = this.edges[idx].verts[0];
+                        left = this.edges[idx].verts[1];
+                    } else {
+                        right = this.edges[idx].verts[1];
+                        left = this.edges[idx].verts[0];
+                    }
+                    v.petals.push(left);
+                    v.petals.push(right);
+                    this.findBoundVerts();
+                }
+                growB() {
+                    let threshEdges = 4;
+                    if (this.extEdgeCount() < threshEdges) {
+                        // print("can't do B growth , exterior edge count < " + threshEdges);
+                        return;
+                    }
+                    let threshPetals = p.round(p.random(4.4, 6));
+                    let not_good_enough = true;
+                    let idx = -1;
+                    for (let v of this.verts) {
+                        if (!v.interior && v.petals.length > threshPetals) {
+                            not_good_enough = false;
+                            idx = v.id
+                        }
+                    }
+                    if (not_good_enough) {
+                        // print("can't do B grwoth , no vertex with >" + threshPetals + " petals");
+                        return;
+                    }
+                    let v = this.verts[idx];
+
+                    //find left and right adjacent exterior vertices (they're not connected, because edges.length>3)
+                    let left = v.petals[0];
+                    let right = v.petals[v.petals.length - 1];
+                    this.edges.push(new Edge(right, left));
+                    v.interior = true;
+                    for (let e of this.edges)
+                        if (e.verts[0] == v.id || e.verts[1] == v.id) e.interior = true;
+                    this.verts[left].petals.push(right);
+                    this.verts[right].petals.push(left);
+                    this.verts[left].normaliseOrder(this.edges);
+                    this.verts[right].normaliseOrder(this.edges);
+
+                    this.findBoundVerts();
+                }
+                growB_(v) {
+
+                    //find left and right adjacent exterior vertices (they're not connected, because edges.length>3)
+                    let left = v.petals[0];
+                    let right = v.petals[v.petals.length - 1];
+                    this.edges.push(new Edge(right, left));
+                    v.interior = true;
+                    for (let e of this.edges)
+                        if (e.verts[0] == v.id || e.verts[1] == v.id) e.interior = true;
+                    this.verts[left].petals.push(right);
+                    this.verts[right].petals.push(left);
+                    this.verts[left].normaliseOrder(this.edges);
+                    this.verts[right].normaliseOrder(this.edges);
+                    this.findBoundVerts();
+
+                }
+                calcPos() {
+                    let fixed = [];
+                    let A = 0;
+                    let B = 1;
+                    this.verts[A].p = p.createVector(0, 0);
+                    this.verts[B].p = p.createVector(this.verts[A].r + this.verts[B].r, 0);
+                    fixed.push(A);
+                    fixed.push(B);
+                    // print(fixed[1]);
+                    // let give_up = 0;
+                    while (fixed.length < this.verts.length) { //} && give_up < 100) {
+                        // give_up++;
+                        // if (give_up > 98) print(give_up);
+                        for (let f in fixed) {
+                            for (let p of this.verts[f].petals) {
+                                if (fixed.includes(p)) continue;
+                                // print(fixed+" has no "+p);
+                                let pp = -1;
+                                let LorR = true;
+                                if (this.verts[f].petals.indexOf(p) == 0) {
+                                    let next = this.verts[f].petals.indexOf(p) + 1;
+                                    pp = this.verts[f].petals[next];
+                                    LorR = false;
+                                    // print(this.verts[f].petals + " next " + p + " & " + pp);
+                                } else {
+                                    let prev = this.verts[f].petals.indexOf(p) - 1;
+                                    pp = this.verts[f].petals[prev];
+                                    // print(this.verts[f].petals + " prev " + p + " & " + pp);
+                                }
+                                if (pp == -1) print("noooo");
+                                if (!fixed.includes(pp)) continue;
+
+                                let r1 = this.verts[f].r;
+                                let r2 = this.verts[pp].r;
+                                let r3 = this.verts[p].r;
+                                let p1 = this.verts[f].p;
+                                let p2 = this.verts[pp].p;
+                                let p3 = p2.copy().sub(p1);
+                                p3.mult(1 / (r1 + r2));
+                                p3.rotate((LorR ? -1 : 1) * this.angle(r1, r2, r3));
+                                p3.mult(r1 + r3);
+                                p3.add(p1);
+
+                                this.verts[p].p = p3;
+                                fixed.push(p);
+                            }
+                        }
+                    }
+
+
+                }
+
+                calcRad() {
+                    this.tries++;
+                    for (let i in range(this.verts.length)) {
+                        let v = this.verts[i];
+                        if (!v.interior) {
+                        } else {
+                            let k = v.petals.length;
+                            let beta = p.sin(this.theta(v) / 2 / k);
+                            let delta = p.sin(p.TAU / 2 / k);
+                            let r_hat = beta / (1 - beta) * v.r;
+                            let x = (1 - delta) / delta * r_hat;
+                            v.r = x;
+                        }
+                    }
+                    let error_ = this.Error(this.verts);
+                }
+                fixOverlap() {
+                    for (let v of this.verts) {
+                        if (!v.interior) {
+                            if (this.theta(v) > p.TAU * 0.75) {
+                                v.r *= 1.04;
+                            } else if (this.theta(v) < p.TAU * 0.25) {
+                                v.r *= 0.96;
+                            }
+                            this.calcRad();
+                            this.calcPos();
+                            // }
+                        }
+                    }
+                }
+                Error() {
+                    let sum = 0;
+                    for (let v of this.verts) {
+                        if (!v.interior) continue;
+                        sum += p.abs(p.TAU - this.theta(v));
+
+                    }
+                    return sum;
+                }
+                theta(v) {
+                    let sum = 0;
+                    let np = v.petals.length;
+                    if (v.interior)
+                        for (let i of range(np))
+                            sum += this.angle(v.r, this.verts[v.petals[i]].r, this.verts[v.petals[(i + 1) % np]].r);
+                    if (!v.interior)
+                        for (let i of range(np - 1))
+                            sum += this.angle(v.r, this.verts[v.petals[i]].r, this.verts[v.petals[i + 1]].r);
+
+                    return sum;
+                }
+                angle(v, u, w) {
+                    return 2 * p.asin(p.sqrt(u * w / (u + v) / (w + v)));
+                }
+                countExt() {
+                    let sum = 0;
+                    for (let v of this.verts)
+                        if (!v.interior) sum++;
+                    return sum;
+                }
+                countInt() {
+                    let sum = 0;
+                    for (let v of this.verts)
+                        if (v.interior) sum++;
+                    return sum;
+                }
+                extEdgeCount() {
+                    let sum = 0;
+                    for (let e of this.edges)
+                        if (!e.interior) sum++;
+                    return sum;
+                }
+            }
+
+            class ComplexBoundary {
+                constructor(C) {
+                    this.error = 0;
+                    this.verts = [];
+                    this.edges = [];
+                    for (let e of C.edges)
+                        this.edges.push(e)
+
+                    for (let v of C.verts)
+                        this.verts.push(v)
+                    for (let v of C.verts)
+                        v.targetAng = this.theta(v)
+
+                    this.tries = 0;
+                    this.boundVerts = [];
+                    this.owe = [0, 0]
+                }
+                doOwe(angle, which) {
+                    let len = this.boundVerts.length
+                    for (let i = 0; i < len; i++) {
+                        if (i == which) {
+                            this.boundVerts[i].targetAng += angle * 1.1
+                        } else {
+                            this.boundVerts[i].targetAng -= 1.1 * angle / (len - 1)
+                        }
+                    }
+                    this.owe = [0, 0]
+                }
+                findBoundVerts() {
+                    this.boundVerts = []
+                    let count = 0;
+                    for (let v of this.verts) {
+                        if (!v.interior) {
+                            if (count < 1)
+                                this.boundVerts.push(v)
+                            count += 1
+                        }
+                    }
+
+                    while (this.boundVerts.length < count)
+                        this.boundVerts.push(this.verts[this.boundVerts[this.boundVerts.length - 1].petals[0]])
+                }
+                setBoundAng(list) {
+                    let angsum = 0;
+                    for (let ang of list)
+                        angsum += ang
+                    let bl = this.boundVerts.length
+                    let ll = list.length
+
+                    for (let i = 0; i < bl; i++) {
+                        this.boundVerts[i].targetAng = p.lerp(p.PI * (bl - 2) / bl, this.theta(this.boundVerts[i]), 0.5)
+                        if (i < ll)
+                            this.boundVerts[i].targetAng = list[i]
+                        else
+                            this.boundVerts[i].targetAng = (p.PI * (bl - 2) - angsum) / (bl - ll)
+                    }
+
+                    for (let v of this.boundVerts)
+                        v.targetAng = p.PI
+
+                    let n = p.round(8 * p.mouseX / p.width)
+                    for (let i = 0; i < n; i++) {
+                        this.boundVerts[p.round(i / n * this.boundVerts.length)].targetAng = PI * (n - 2) / n
+                    }
+
+                }
+                display(M) {
+                    p.textAlign(p.CENTER, p.BOTTOM);
+                    this.error = this.Error();
+                    if (animate || sCol > 0.001) {
+                        if (animate)
+                            p.stroke(fg, 255 * (1 - sCol));
+                        else
+                            p.stroke(fg, 255 * (sCol));
+                        for (let e of this.edges) e.show();
+                    }
+                    if (!animate || sCol > 0.001) {
+                        for (let v of this.verts) {
+                            p.noFill();
+                            if (animate)
+                                p.stroke(fg, 255 * (sCol));
+                            else
+                                p.stroke(fg, 255 * (1 - sCol));
+                            p.strokeWeight(1);
+                            
+                            if (this.boundVerts.length > 0)
+                                if (v.id == this.boundVerts[selected].id) p.stroke(red)
+                            p.circle((v.p.x) * M, (v.p.y) * M, v.r * M);
+                        
+                        }
+                        if (animate)
+                            p.stroke(fg, 100 * (sCol));
+                        else
+                            p.stroke(fg, 100 * (1 - sCol));
+                        if (!hide) {
+                            for (let e of this.edges) {
+                                let p1 = this.verts[e.verts[0]].p;
+                                let p2 = this.verts[e.verts[1]].p;
+                                p.strokeWeight(1);
+                                p.line((p1.x) * M, (p1.y) * M, p2.x * M, p2.y * M);
+                            }
+                        }
+                    }
+                }
+                growA() {
+                    var v = new Vertex([]);
+                    this.verts.push(v);
+                    let idx = p.floor(p.random(this.edges.length));
+                    let not_good_enough = true;
+                    while (not_good_enough) {
+                        idx = p.floor(p.random(this.edges.length));
+                        if (!this.edges[idx].interior) not_good_enough = false;
+                    }
+
+                    let P = this.edges[idx].verts[0];
+                    let Q = this.edges[idx].verts[1];
+                    this.edges.push(new Edge(v.id, P));
+                    this.edges.push(new Edge(v.id, Q));
+                    this.edges[idx].interior = true;
+                    this.verts[P].petals.push(v.id);
+                    this.verts[Q].petals.push(v.id);
+                    this.verts[P].normaliseOrder(this.edges);
+                    this.verts[Q].normaliseOrder(this.edges);
+
+                    let left = -1;
+                    let right = -1;
+                    if (this.verts[this.edges[idx].verts[0]].petals[0] == v.id) {
+                        right = this.edges[idx].verts[0];
+                        left = this.edges[idx].verts[1];
+                    } else {
+                        right = this.edges[idx].verts[1];
+                        left = this.edges[idx].verts[0];
+                    }
+                    v.petals.push(left);
+                    v.petals.push(right);
+                }
+                growB() {
+                    let threshEdges = 4;
+                    if (this.extEdgeCount() < threshEdges) {
+                        return;
+                    }
+                    let threshPetals = p.round(p.random(4.4, 6));
+                    let not_good_enough = true;
+                    let idx = -1;
+                    for (let v of this.verts) {
+                        if (!v.interior && v.petals.length > threshPetals) {
+                            not_good_enough = false;
+                            idx = v.id
+                        }
+                    }
+                    if (not_good_enough) {
+                        return;
+                    }
+                    let v = this.verts[idx];
+
+                    //find left and right adjacent exterior vertices (they're not connected, because edges.length>3)
+                    let left = v.petals[0];
+                    let right = v.petals[v.petals.length - 1];
+                    this.edges.push(new Edge(right, left));
+                    v.interior = true;
+                    for (let e of this.edges)
+                        if (e.verts[0] == v.id || e.verts[1] == v.id) e.interior = true;
+                    this.verts[left].petals.push(right);
+                    this.verts[right].petals.push(left);
+                    this.verts[left].normaliseOrder(this.edges);
+                    this.verts[right].normaliseOrder(this.edges);
+
+                }
+                growB_(v) {
+
+                    //find left and right adjacent exterior vertices (they're not connected, because edges.length>3)
+                    let left = v.petals[0];
+                    let right = v.petals[v.petals.length - 1];
+                    this.edges.push(new Edge(right, left));
+                    v.interior = true;
+                    for (let e of this.edges)
+                        if (e.verts[0] == v.id || e.verts[1] == v.id) e.interior = true;
+                    this.verts[left].petals.push(right);
+                    this.verts[right].petals.push(left);
+                    this.verts[left].normaliseOrder(this.edges);
+                    this.verts[right].normaliseOrder(this.edges);
+
+                }
+                calcPos() {
+                    let fixed = [];
+                    let A = 0;
+                    let B = 1;
+                    this.verts[A].p = p.createVector(0, 0);
+                    this.verts[B].p = p.createVector(this.verts[A].r + this.verts[B].r, 0);
+                    fixed.push(A);
+                    fixed.push(B);
+                    while (fixed.length < this.verts.length) { //} && give_up < 100) {
+                        for (let f in fixed) {
+                            for (let p of this.verts[f].petals) {
+                                if (fixed.includes(p)) continue;
+                                let pp = -1;
+                                let LorR = true;
+                                if (this.verts[f].petals.indexOf(p) == 0) {
+                                    let next = this.verts[f].petals.indexOf(p) + 1;
+                                    pp = this.verts[f].petals[next];
+                                    LorR = false;
+                                } else {
+                                    let prev = this.verts[f].petals.indexOf(p) - 1;
+                                    pp = this.verts[f].petals[prev];
+                                }
+                                if (pp == -1) print("noooo");
+                                if (!fixed.includes(pp)) continue;
+
+                                let r1 = this.verts[f].r;
+                                let r2 = this.verts[pp].r;
+                                let r3 = this.verts[p].r;
+                                let p1 = this.verts[f].p;
+                                let p2 = this.verts[pp].p;
+                                let p3 = p2.copy().sub(p1);
+                                p3.mult(1 / (r1 + r2));
+                                p3.rotate((LorR ? -1 : 1) * this.angle(r1, r2, r3));
+                                p3.mult(r1 + r3);
+                                p3.add(p1);
+
+                                this.verts[p].p = p3;
+                                fixed.push(p);
+                            }
+                        }
+                    }
+                    
+                    let bound_max = p.createVector(Math.max(...this.verts.map(v => v.p.x + v.r)), Math.max(...this.verts.map(v => v.p.y + v.r)));
+                    let bound_min = p.createVector(Math.min(...this.verts.map(v => v.p.x - v.r)), Math.min(...this.verts.map(v => v.p.y - v.r)));
+                    let margin = 50;
+                    let scale = 0.02*Math.min((p.width-margin*2)/(bound_max.x-bound_min.x), (p.height-margin*2)/(bound_max.y-bound_min.y));
+                    // let scale = (p.height-margin*2)/(bound_max.y-bound_min.y);
+                    // console.log(p.height-margin*2, bound_max.y-bound_min.y, scale);
+
+                    for (let v of this.verts) {
+                        v.p.add(- bound_min.x * 0.5 - bound_max.x * 0.5, - bound_min.y * 0.5 - bound_max.y * 0.5)
+                        v.p.mult(scale);
+                        v.r *= scale;
+                    }
+                }
+
+                calcRad() {
+                    this.tries++;
+                    for (let i in range(this.verts.length)) {
+                        let v = this.verts[i];
+                        if (v.interior) continue
+                        let k = v.petals.length - 1;
+                        let beta = p.sin(this.theta(v) / 2 / k);
+                        let delta = p.sin(v.targetAng / 2 / k);
+                        if (v.interior) delta = p.sin(p.TAU / 2 / k);
+                        let r_hat = beta / (1 - beta) * v.r;
+                        let x = (1 - delta) / delta * r_hat;
+                        v.r = x;
+                    }
+                    for (let i in range(this.verts.length)) {
+                        let v = this.verts[i];
+                        if (!v.interior) continue
+                        let k = v.petals.length;
+                        let tar = p.TAU * p.mouseX / p.width
+                        let beta = p.sin(this.theta(v) / 2 / k);
+                        let delta = p.sin(tar / 2 / k);
+                        if (v.interior) delta = p.sin(p.TAU / 2 / k);
+                        let r_hat = beta / (1 - beta) * v.r;
+                        let x = (1 - delta) / delta * r_hat;
+                        v.r = x;
+                    }
+                    for (let i in range(this.verts.length)) {
+                        let v = this.verts[i];
+                        if (i > 0)
+                            v.r /= this.verts[0].r
+                    }
+                    this.verts[0].r = 1
+                    let error_ = this.Error(this.verts);
+                }
+    
+                Error() {
+                    let sum = 0;
+                    for (let v of this.verts) {
+                        if (!v.interior) continue;
+                        sum += p.abs(p.TAU - this.theta(v));
+
+                    }
+                    return sum;
+                }
+                theta(v) {
+                    let sum = 0;
+                    let np = v.petals.length;
+                    if (v.interior)
+                        for (let i of range(np)) {
+                            sum += this.angle(v.r, this.verts[v.petals[i]].r, this.verts[v.petals[(i + 1) % np]].r);
+                        }
+                    else
+                        for (let i of range(np - 1)) {
+                            sum += this.angle(v.r, this.verts[v.petals[i]].r, this.verts[v.petals[i + 1]].r);
+                        }
+                    return sum;
+                }
+                angle(v, u, w) {
+                    return 2 * p.asin(p.sqrt(u * w / (u + v) / (w + v)));
+                }
+                countExt() {
+                    let sum = 0;
+                    for (let v of this.verts)
+                        if (!v.interior) sum++;
+                    return sum;
+                }
+                countInt() {
+                    let sum = 0;
+                    for (let v of this.verts)
+                        if (v.interior) sum++;
+                    return sum;
+                }
+                extEdgeCount() {
+                    let sum = 0;
+                    for (let e of this.edges)
+                        if (!e.interior) sum++;
+                    return sum;
+                }
+            }
+        };
+
+        new p5(sketch, 'container');
+    </script>
+</body>
+
+</html>
