@@ -1,0 +1,1 @@
+const scrollJacking=e=>{if(!e.deltaY||e.shiftKey)return;e.currentTarget.scrollLeft+=e.deltaY};document.querySelectorAll(".scrollable").forEach(e=>{e.addEventListener("wheel",scrollJacking)})

@@ -1,123 +1,48 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  
   <url>
     <loc>https://jn3008.com/</loc>
     <lastmod>2020-12-23T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://jn3008.com/blender/</loc>
     <lastmod>2020-12-23T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://jn3008.com/blender/blender/</loc>
     <lastmod>2020-12-23T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://jn3008.com/tags/hugo/</loc>
     <lastmod>2020-12-23T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://jn3008.com/nfts/</loc>
     <lastmod>2020-12-23T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://jn3008.com/nfts/nfts/</loc>
     <lastmod>2020-12-23T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://jn3008.com/processing/</loc>
     <lastmod>2020-12-23T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://jn3008.com/processing/processing/</loc>
     <lastmod>2020-12-23T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://jn3008.com/tags/</loc>
     <lastmod>2020-12-23T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://jn3008.com/blog/</loc>
-    <lastmod>2020-06-05T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://jn3008.com/tags/css/</loc>
-    <lastmod>2020-06-05T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://jn3008.com/tags/html/</loc>
-    <lastmod>2020-06-05T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://jn3008.com/tags/markdown/</loc>
-    <lastmod>2020-06-05T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://jn3008.com/blog/markdown-syntax-guide/</loc>
-    <lastmod>2020-06-05T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://jn3008.com/tags/math/</loc>
-    <lastmod>2020-06-05T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://jn3008.com/blog/math-typesetting/</loc>
-    <lastmod>2020-06-05T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://jn3008.com/blog/rich-text/</loc>
-    <lastmod>2020-06-05T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://jn3008.com/tags/shortcodes/</loc>
-    <lastmod>2020-06-05T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://jn3008.com/tags/themes/</loc>
-    <lastmod>2020-06-05T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://jn3008.com/p5.js/</loc>
     <lastmod>2020-06-04T09:19:29-04:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://jn3008.com/blog/example-post/</loc>
-    <lastmod>2020-06-04T09:19:29-04:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://jn3008.com/p5.js/example-post/</loc>
     <lastmod>2020-06-04T09:19:29-04:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
+    <loc>https://jn3008.com/other/other/</loc>
+    <lastmod>1834-12-23T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://jn3008.com/other/</loc>
+    <lastmod>1834-12-23T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://jn3008.com/categories/</loc>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://jn3008.com/p5.js/displayp5/</loc>
   </url>
-  
 </urlset>
