@@ -238,5 +238,9 @@
   "https://cdn.jn3008.com/processing/hidden-cube.mp4": {
     "width": 100,
     "height": 100
+  },
+  "https://cdn.jn3008.com/processing/gosper-space-cubes.mp4": {
+    "width": 100,
+    "height": 100
   }
 }
